@@ -1356,21 +1356,28 @@
       const closed = days.filter(day => scoreFor(day) >= 100).length;
 
       const best = habits
-        .map(h => ({ ...h, count: days.filter(day => getDayData(day).habits[h.id]).length }))
+        .map(h => ({ ...h, count: days.filter(day => !!getDayData(day).habits[h.id]).length }))
         .sort((a,b) => b.count - a.count)[0];
 
       const score = Math.min(100, Math.round((avg * 0.7) + (closed / 7 * 100 * 0.3)));
 
-      document.getElementById('bigBossScore').textContent = score;
-      document.getElementById('scoreClosed').textContent = closed;
-      document.getElementById('scoreAvg').textContent = avg + '%';
-      document.getElementById('scoreTop').textContent = best && best.count > 0 ? best.emoji : '-';
+      const bigBossScore = document.getElementById('bigBossScore');
+      const scoreClosed = document.getElementById('scoreClosed');
+      const scoreAvg = document.getElementById('scoreAvg');
+      const scoreTop = document.getElementById('scoreTop');
+      const copyEl = document.getElementById('bigBossCopy');
+
+      if (bigBossScore) bigBossScore.textContent = score;
+      if (scoreClosed) scoreClosed.textContent = closed;
+      if (scoreAvg) scoreAvg.textContent = avg + '%';
+      if (scoreTop) scoreTop.textContent = best && best.count > 0 ? best.emoji : '-';
 
       let copy = 'La tua settimana prende forma, un check alla volta.';
       if (score >= 85) copy = 'Settimana da boss. Ritmo alto, testa lucida.';
       else if (score >= 60) copy = 'Buona direzione. Ora prova a chiudere qualche giorno al 100%.';
       else if (score > 0) copy = 'Non serve spaccare tutto. Riparti da 3 check oggi.';
-      document.getElementById('bigBossCopy').textContent = copy;
+
+      if (copyEl) copyEl.textContent = copy;
     }
 
     function renderHero() {
@@ -1562,6 +1569,74 @@
     }
 
 
+    function renderWeight() {
+      const dayData = getDayData(selectedDay);
+      const current = document.getElementById('currentWeight');
+      const trend = document.getElementById('weightTrend');
+      const chart = document.getElementById('weightChart');
+
+      if (!current || !trend || !chart) return;
+
+      current.textContent = dayData.weight && String(dayData.weight).trim() !== '' ? String(dayData.weight).replace('.', ',') : '--';
+
+      const weights = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = toKey(d);
+        const raw = getDayData(key).weight;
+        const w = parseFloat(String(raw || '').replace(',', '.'));
+
+        if (!isNaN(w)) {
+          weights.push({
+            day: d.toLocaleDateString('it-IT', { weekday: 'short' }),
+            value: w
+          });
+        }
+      }
+
+      if (weights.length >= 2) {
+        const diffNum = weights[weights.length - 1].value - weights[0].value;
+        const diffAbs = Math.abs(diffNum).toFixed(1).replace('.', ',');
+
+        if (diffNum < 0) {
+          trend.textContent = `↓ -${diffAbs} kg settimana`;
+          trend.style.background = '#E8F8EE';
+          trend.style.color = '#1f8f43';
+        } else if (diffNum > 0) {
+          trend.textContent = `↑ +${diffAbs} kg settimana`;
+          trend.style.background = '#FFF3E0';
+          trend.style.color = '#C26A00';
+        } else {
+          trend.textContent = 'Peso stabile';
+          trend.style.background = '#f5f5f7';
+          trend.style.color = '#6f6f77';
+        }
+      } else {
+        trend.textContent = 'Nessun trend';
+        trend.style.background = '#f5f5f7';
+        trend.style.color = '#6f6f77';
+      }
+
+      chart.innerHTML = '';
+
+      if (weights.length > 0) {
+        const values = weights.map(w => w.value);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        weights.forEach(item => {
+          const normalized = max === min ? 70 : 20 + ((item.value - min) / (max - min)) * 70;
+
+          const bar = document.createElement('div');
+          bar.className = 'weight-bar';
+          bar.style.height = normalized + '%';
+          bar.innerHTML = `<span>${item.day}</span>`;
+          chart.appendChild(bar);
+        });
+      }
+    }
+
     function renderCalendar() {
       document.getElementById('monthLabel').textContent =
         calendarAnchor.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
@@ -1623,34 +1698,44 @@
       const days = last7Days();
       const weekAverage = Math.round(days.reduce((sum, day) => sum + scoreFor(day), 0) / days.length);
       const closedDays = days.filter(day => scoreFor(day) >= 100).length;
-      document.getElementById('weekAverage').textContent = weekAverage + '%';
-      document.getElementById('closedDays').textContent = closedDays;
+
+      const weekAverageEl = document.getElementById('weekAverage');
+      const closedDaysEl = document.getElementById('closedDays');
+
+      if (weekAverageEl) weekAverageEl.textContent = weekAverage + '%';
+      if (closedDaysEl) closedDaysEl.textContent = closedDays;
 
       const row = document.getElementById('weekRow');
-      row.innerHTML = days.map(day => {
-        const d = parseKey(day);
-        const name = d.toLocaleDateString('it-IT', { weekday: 'short' });
-        const count = countCompleted(day);
-        const opacity = 0.35 + Math.min(count / dailyTarget, 1) * 0.65;
-        return `
-          <div class="week-day">
-            <div class="week-name">${name}</div>
-            <div class="week-count" style="opacity:${opacity}">${count}</div>
-          </div>
-        `;
-      }).join('');
+      if (row) {
+        row.innerHTML = days.map(day => {
+          const d = parseKey(day);
+          const name = d.toLocaleDateString('it-IT', { weekday: 'short' });
+          const count = countCompleted(day);
+          const opacity = 0.35 + Math.min(count / dailyTarget, 1) * 0.65;
+
+          return `
+            <div class="week-day">
+              <div class="week-name">${name}</div>
+              <div class="week-count" style="opacity:${opacity}">${count}</div>
+            </div>
+          `;
+        }).join('');
+      }
 
       const bars = document.getElementById('weeklyBars');
-      bars.innerHTML = habits.map(habit => {
-        const count = days.filter(day => getDayData(day).habits[habit.id]).length;
-        const width = Math.min((count / habit.goal) * 100, 100);
-        return `
-          <div class="bar-row">
-            <div class="bar-label"><span>${habit.emoji} ${habit.name}</span><span>${count}/${habit.goal}</span></div>
-            <div class="bar"><div style="width:${width}%"></div></div>
-          </div>
-        `;
-      }).join('');
+      if (bars) {
+        bars.innerHTML = habits.map(habit => {
+          const count = days.filter(day => !!getDayData(day).habits[habit.id]).length;
+          const width = Math.min((count / habit.goal) * 100, 100);
+
+          return `
+            <div class="bar-row">
+              <div class="bar-label"><span>${habit.emoji} ${habit.name}</span><span>${count}/${habit.goal}</span></div>
+              <div class="bar"><div style="width:${width}%"></div></div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     function renderAll() {
