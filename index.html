@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f5f5f7" />
   <title>Habit Tracker</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Habit Tracker" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23111114'/%3E%3Cpath d='M28 52l13 13 31-35' fill='none' stroke='%2334C759' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <style>
     :root{
       --bg:#f5f5f7;
@@ -461,6 +465,21 @@
       color:var(--green-dark);
     }
 
+    .day.score-33{
+      background:#FFECEC;
+      color:#C92A2A;
+    }
+
+    .day.score-66{
+      background:#FFF3E0;
+      color:#C26A00;
+    }
+
+    .day.score-100{
+      background:#E8F8EE;
+      color:var(--green-dark);
+    }
+
     .day.selected{
       background:var(--black);
       color:#fff;
@@ -604,6 +623,153 @@
       font-weight:850;
     }
 
+
+    .hero-actions{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .hero-pill{
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      color:rgba(255,255,255,.82);
+      padding:10px 12px;
+      font-size:12px;
+      font-weight:850;
+      text-align:center;
+    }
+
+    .habit.just-toggled{
+      animation:pop .28s ease;
+    }
+
+    @keyframes pop{
+      0%{transform:scale(1)}
+      50%{transform:scale(1.025)}
+      100%{transform:scale(1)}
+    }
+
+    .confetti{
+      pointer-events:none;
+      position:fixed;
+      inset:0;
+      z-index:50;
+      overflow:hidden;
+    }
+
+    .confetti span{
+      position:absolute;
+      top:-20px;
+      width:10px;
+      height:16px;
+      border-radius:4px;
+      animation:fall 900ms ease-out forwards;
+    }
+
+    @keyframes fall{
+      to{
+        transform:translateY(110vh) rotate(420deg);
+        opacity:0;
+      }
+    }
+
+    .legend{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      background:#f5f5f7;
+      padding:7px 9px;
+      color:#777780;
+      font-size:11px;
+      font-weight:850;
+    }
+
+    .legend-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:#ddd;
+    }
+
+    .dot-red{background:#FFECEC;border:1px solid #F2B8B8}
+    .dot-orange{background:#FFF3E0;border:1px solid #FFD599}
+    .dot-green{background:#E8F8EE;border:1px solid #A9E8BD}
+
+    .insight-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .insight{
+      background:#f5f5f7;
+      border-radius:24px;
+      padding:14px;
+    }
+
+    .insight-label{
+      color:#8b8b93;
+      font-size:12px;
+      font-weight:850;
+      margin-bottom:7px;
+    }
+
+    .insight-value{
+      font-size:26px;
+      line-height:1;
+      font-weight:950;
+      letter-spacing:-1px;
+    }
+
+    .tabbar{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      width:min(390px, calc(100vw - 34px));
+      height:68px;
+      border-radius:999px;
+      background:rgba(255,255,255,.84);
+      box-shadow:0 18px 50px rgba(0,0,0,.14);
+      backdrop-filter:blur(22px);
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      padding:7px;
+      z-index:20;
+    }
+
+    .tab{
+      border-radius:999px;
+      background:transparent;
+      color:#8b8b93;
+      font-size:12px;
+      font-weight:950;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+
+    .tab.active{
+      background:#111114;
+      color:white;
+    }
+
+    .app{
+      padding-bottom:88px;
+    }
+
     @media (max-width:360px){
       body{padding-left:12px;padding-right:12px}
       h1{font-size:38px}
@@ -632,6 +798,10 @@
       </div>
       <div class="progress"><div id="progressBar"></div></div>
       <div class="hero-copy" id="heroCopy">Ti bastano 3 check al giorno. Niente perfezione, solo costanza.</div>
+      <div class="hero-actions">
+        <div class="hero-pill" id="missingChecks">Ti mancano 3 check</div>
+        <div class="hero-pill" id="selectedMoodPill">Mood 🙂</div>
+      </div>
     </section>
 
     <section class="stats">
@@ -652,7 +822,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="todaySection">
       <div class="section-head">
         <div>
           <h2>Abitudini</h2>
@@ -673,7 +843,7 @@
       <textarea id="note" placeholder="Cosa salvo di oggi? Cosa posso migliorare domani?"></textarea>
     </section>
 
-    <section class="section">
+    <section class="section" id="calendarSection">
       <div class="section-head">
         <div>
           <h2>Calendario</h2>
@@ -689,6 +859,11 @@
           <div>L</div><div>M</div><div>M</div><div>G</div><div>V</div><div>S</div><div>D</div>
         </div>
         <div class="calendar" id="calendar"></div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot dot-red"></span>33%</div>
+          <div class="legend-item"><span class="legend-dot dot-orange"></span>66%</div>
+          <div class="legend-item"><span class="legend-dot dot-green"></span>100%</div>
+        </div>
       </div>
     </section>
 
@@ -707,18 +882,35 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="statsSection">
       <div class="section-head">
-        <h2>Ultimi 7 giorni</h2>
+        <h2>Statistiche</h2>
       </div>
       <div class="week-card">
-        <div class="week-row" id="weekRow"></div>
+        <div class="insight-grid">
+          <div class="insight">
+            <div class="insight-label">Media settimana</div>
+            <div class="insight-value" id="weekAverage">0%</div>
+          </div>
+          <div class="insight">
+            <div class="insight-label">Giorni chiusi</div>
+            <div class="insight-value" id="closedDays">0</div>
+          </div>
+        </div>
+        <div class="week-row" id="weekRow" style="margin-top:18px"></div>
         <div id="weeklyBars"></div>
       </div>
     </section>
 
     <footer>Built with momentum ✨</footer>
   </main>
+
+  <nav class="tabbar" aria-label="Navigazione">
+    <button class="tab active" data-target="todaySection">✅ Oggi</button>
+    <button class="tab" data-target="calendarSection">📅 Calendario</button>
+    <button class="tab" data-target="statsSection">📊 Stats</button>
+  </nav>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
 
   <script>
     const habits = [
@@ -753,6 +945,7 @@
     const today = toKey(new Date());
     let selectedDay = today;
     let calendarAnchor = new Date();
+    let lastToggledHabit = null;
 
     let data = {};
     try {
@@ -810,13 +1003,18 @@
     }
 
     function renderHero() {
+      const dayData = getDayData(selectedDay);
       const completed = countCompleted(selectedDay);
       const score = scoreFor(selectedDay);
+      const missing = Math.max(dailyTarget - completed, 0);
       document.getElementById('percentage').textContent = score + '%';
       document.getElementById('targetBox').textContent = `${completed}/${dailyTarget}`;
       document.getElementById('progressBar').style.width = score + '%';
       document.getElementById('heroCopy').textContent =
-        score >= 100 ? 'Target centrato. Giornata chiusa bene.' : 'Ti bastano 3 check al giorno. Niente perfezione, solo costanza.';
+        score >= 100 ? 'Target centrato. Giornata chiusa bene.' : `Ti ${missing === 1 ? 'manca' : 'mancano'} ${missing} check per chiudere la giornata.`;
+      document.getElementById('missingChecks').textContent =
+        missing === 0 ? 'Giornata completata' : `${missing === 1 ? 'Manca' : 'Mancano'} ${missing} check`;
+      document.getElementById('selectedMoodPill').textContent = `Mood ${getMood(dayData.mood).emoji}`;
     }
 
     function renderStats() {
@@ -840,7 +1038,7 @@
       habits.forEach(habit => {
         const active = !!dayData.habits[habit.id];
         const btn = document.createElement('button');
-        btn.className = 'habit' + (active ? ' active' : '');
+        btn.className = 'habit' + (active ? ' active' : '') + (lastToggledHabit === habit.id ? ' just-toggled' : '');
         btn.innerHTML = `
           <div class="habit-left">
             <div class="emoji-box">${habit.emoji}</div>
@@ -852,9 +1050,16 @@
           <div class="check">${active ? '✓' : '+'}</div>
         `;
         btn.addEventListener('click', () => {
+          const beforeScore = scoreFor(selectedDay);
           dayData.habits[habit.id] = !dayData.habits[habit.id];
+          lastToggledHabit = habit.id;
           save();
           renderAll();
+          if (beforeScore < 100 && scoreFor(selectedDay) === 100) launchConfetti();
+          setTimeout(() => {
+            lastToggledHabit = null;
+            renderHabits();
+          }, 320);
         });
         wrap.appendChild(btn);
       });
@@ -919,12 +1124,19 @@
           return;
         }
 
+        const score = scoreFor(day);
+        let scoreClass = '';
+        if (score === 100) scoreClass = ' score-100';
+        else if (score >= 66) scoreClass = ' score-66';
+        else if (score >= 33) scoreClass = ' score-33';
+
         btn.className =
           'day' +
+          scoreClass +
           (day === today ? ' today' : '') +
           (day === selectedDay ? ' selected' : '');
 
-        btn.innerHTML = `<div>${parseKey(day).getDate()}</div><div class="day-score">${scoreFor(day)}%</div>`;
+        btn.innerHTML = `<div>${parseKey(day).getDate()}</div><div class="day-score">${score}%</div>`;
         btn.addEventListener('click', () => {
           selectedDay = day;
           renderAll();
@@ -955,6 +1167,11 @@
 
     function renderWeek() {
       const days = last7Days();
+      const weekAverage = Math.round(days.reduce((sum, day) => sum + scoreFor(day), 0) / days.length);
+      const closedDays = days.filter(day => scoreFor(day) >= 100).length;
+      document.getElementById('weekAverage').textContent = weekAverage + '%';
+      document.getElementById('closedDays').textContent = closedDays;
+
       const row = document.getElementById('weekRow');
       row.innerHTML = days.map(day => {
         const d = parseKey(day);
@@ -1009,6 +1226,32 @@
     document.getElementById('nextMonth').addEventListener('click', () => {
       calendarAnchor = new Date(calendarAnchor.getFullYear(), calendarAnchor.getMonth() + 1, 1);
       renderCalendar();
+    });
+
+
+    function launchConfetti() {
+      const wrap = document.getElementById('confetti');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      const colors = ['#34C759', '#30D158', '#FFD60A', '#FF9F0A', '#007AFF'];
+      for (let i = 0; i < 26; i++) {
+        const piece = document.createElement('span');
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDelay = (Math.random() * 180) + 'ms';
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        wrap.appendChild(piece);
+      }
+      setTimeout(() => { wrap.innerHTML = ''; }, 1200);
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.getElementById(tab.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     });
 
     renderAll();
