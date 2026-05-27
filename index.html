@@ -815,6 +815,258 @@
     }
 
 
+
+    .tap-pop{
+      animation:tapPop .22s ease;
+    }
+
+    @keyframes tapPop{
+      0%{transform:scale(1)}
+      50%{transform:scale(.975)}
+      100%{transform:scale(1)}
+    }
+
+    .splash{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      background:#f5f5f7;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      transition:opacity .45s ease, visibility .45s ease;
+    }
+
+    .splash.hidden{
+      opacity:0;
+      visibility:hidden;
+    }
+
+    .splash-icon{
+      width:96px;
+      height:96px;
+      border-radius:28px;
+      box-shadow:0 22px 55px rgba(0,0,0,.14);
+      margin-bottom:18px;
+      object-fit:cover;
+      animation:splashFloat 1.1s ease infinite alternate;
+    }
+
+    @keyframes splashFloat{
+      from{transform:translateY(0)}
+      to{transform:translateY(-8px)}
+    }
+
+    .splash-title{
+      font-size:28px;
+      font-weight:950;
+      letter-spacing:-1px;
+    }
+
+    .score-card{
+      background:linear-gradient(135deg,#111114,#242429);
+      color:white;
+      border-radius:36px;
+      padding:24px;
+      box-shadow:0 24px 64px rgba(0,0,0,.20);
+      margin-bottom:24px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .score-card:after{
+      content:"";
+      position:absolute;
+      width:190px;
+      height:190px;
+      right:-70px;
+      top:-80px;
+      border-radius:999px;
+      background:rgba(52,199,89,.22);
+      filter:blur(22px);
+    }
+
+    .score-content{
+      position:relative;
+      z-index:2;
+    }
+
+    .score-label{
+      color:rgba(255,255,255,.55);
+      font-size:14px;
+      font-weight:850;
+      margin-bottom:6px;
+    }
+
+    .score-number{
+      font-size:68px;
+      line-height:.9;
+      font-weight:950;
+      letter-spacing:-5px;
+      color:#30D158;
+    }
+
+    .score-sub{
+      margin-top:12px;
+      color:rgba(255,255,255,.70);
+      font-size:15px;
+      line-height:1.45;
+      font-weight:650;
+    }
+
+    .score-mini{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:9px;
+    }
+
+    .score-mini div{
+      background:rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:11px 8px;
+      text-align:center;
+    }
+
+    .score-mini strong{
+      display:block;
+      font-size:19px;
+      font-weight:950;
+      margin-bottom:3px;
+    }
+
+    .score-mini span{
+      color:rgba(255,255,255,.55);
+      font-size:10px;
+      font-weight:850;
+    }
+
+    .weight-card{
+      cursor:pointer;
+      transition:transform .2s ease;
+    }
+
+    .weight-card:active{
+      transform:scale(.99);
+    }
+
+    .weight-input{
+      display:none;
+    }
+
+    .bottom-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.22);
+      backdrop-filter:blur(8px);
+      z-index:70;
+      opacity:0;
+      visibility:hidden;
+      transition:.25s ease;
+    }
+
+    .bottom-overlay.open{
+      opacity:1;
+      visibility:visible;
+    }
+
+    .bottom-sheet{
+      position:fixed;
+      left:50%;
+      bottom:0;
+      transform:translate(-50%,110%);
+      width:min(440px,100vw);
+      background:#fff;
+      border-radius:34px 34px 0 0;
+      padding:14px 20px 28px;
+      z-index:80;
+      box-shadow:0 -24px 70px rgba(0,0,0,.20);
+      transition:transform .32s cubic-bezier(.2,.9,.2,1);
+    }
+
+    .bottom-sheet.open{
+      transform:translate(-50%,0);
+    }
+
+    .sheet-handle{
+      width:46px;
+      height:5px;
+      border-radius:999px;
+      background:#d7d7dc;
+      margin:0 auto 20px;
+    }
+
+    .sheet-title{
+      font-size:28px;
+      font-weight:950;
+      letter-spacing:-1px;
+      margin-bottom:6px;
+    }
+
+    .sheet-sub{
+      color:#85858d;
+      font-size:14px;
+      font-weight:650;
+      margin-bottom:18px;
+    }
+
+    .sheet-input{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:28px;
+      background:#f5f5f7;
+      padding:20px;
+      font-size:36px;
+      font-weight:950;
+      letter-spacing:-1px;
+      text-align:center;
+      margin-bottom:14px;
+    }
+
+    .sheet-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .sheet-btn{
+      border-radius:999px;
+      padding:15px;
+      font-size:15px;
+      font-weight:950;
+    }
+
+    .sheet-btn.secondary{
+      background:#f0f0f3;
+      color:#55555d;
+    }
+
+    .sheet-btn.primary{
+      background:#111114;
+      color:white;
+    }
+
+    .calendar-card{
+      position:relative;
+      overflow:hidden;
+    }
+
+    .calendar-card:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));
+      pointer-events:none;
+    }
+
+    .calendar,.weekdays,.legend{
+      position:relative;
+      z-index:2;
+    }
+
     @media (max-width:360px){
       body{padding-left:12px;padding-right:12px}
       h1{font-size:38px}
@@ -824,6 +1076,10 @@
   </style>
 </head>
 <body>
+  <div class="splash" id="splash">
+    <img class="splash-icon" src="icon-512.png" alt="Habit Tracker" />
+    <div class="splash-title">Habit Tracker</div>
+  </div>
   <main class="app">
     <header>
       <div>
@@ -832,6 +1088,20 @@
       </div>
       <div class="app-icon">✨</div>
     </header>
+
+
+    <section class="score-card">
+      <div class="score-content">
+        <div class="score-label">Big Boss Score</div>
+        <div class="score-number" id="bigBossScore">0</div>
+        <div class="score-sub" id="bigBossCopy">La tua settimana prende forma, un check alla volta.</div>
+        <div class="score-mini">
+          <div><strong id="scoreClosed">0</strong><span>giorni 100%</span></div>
+          <div><strong id="scoreAvg">0%</strong><span>media</span></div>
+          <div><strong id="scoreTop">-</strong><span>top habit</span></div>
+        </div>
+      </div>
+    </section>
 
     <section class="hero">
       <div class="hero-main">
@@ -906,7 +1176,7 @@
           <div class="weight-trend" id="weightTrend">Nessun trend</div>
         </div>
 
-        <input type="number" step="0.1" id="weightInput" class="weight-input" placeholder="Inserisci peso di oggi" />
+        <button class="sheet-btn primary" id="openWeightSheet" style="width:100%;margin-bottom:14px">Aggiorna peso</button>
 
         <div class="weight-chart" id="weightChart"></div>
       </div>
@@ -975,6 +1245,19 @@
   </main>
 
   <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+
+  <div class="bottom-overlay" id="bottomOverlay"></div>
+  <div class="bottom-sheet" id="weightSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Aggiorna peso</div>
+    <div class="sheet-sub">Inserisci il peso del giorno selezionato. Conta il trend, non il singolo numero.</div>
+    <input type="text" inputmode="decimal" id="sheetWeightInput" class="sheet-input" placeholder="82.4" />
+    <div class="sheet-actions">
+      <button class="sheet-btn secondary" id="closeWeightSheet">Annulla</button>
+      <button class="sheet-btn primary" id="saveWeightSheet">Salva</button>
+    </div>
+  </div>
 
   <script>
     const habits = [
@@ -1064,6 +1347,30 @@
     function renderHeader() {
       document.getElementById('dateLabel').textContent =
         selectedDay === today ? 'Oggi' : formatLong(selectedDay);
+    }
+
+
+    function renderBigBossScore() {
+      const days = last7Days();
+      const avg = Math.round(days.reduce((sum, day) => sum + scoreFor(day), 0) / days.length);
+      const closed = days.filter(day => scoreFor(day) >= 100).length;
+
+      const best = habits
+        .map(h => ({ ...h, count: days.filter(day => getDayData(day).habits[h.id]).length }))
+        .sort((a,b) => b.count - a.count)[0];
+
+      const score = Math.min(100, Math.round((avg * 0.7) + (closed / 7 * 100 * 0.3)));
+
+      document.getElementById('bigBossScore').textContent = score;
+      document.getElementById('scoreClosed').textContent = closed;
+      document.getElementById('scoreAvg').textContent = avg + '%';
+      document.getElementById('scoreTop').textContent = best && best.count > 0 ? best.emoji : '-';
+
+      let copy = 'La tua settimana prende forma, un check alla volta.';
+      if (score >= 85) copy = 'Settimana da boss. Ritmo alto, testa lucida.';
+      else if (score >= 60) copy = 'Buona direzione. Ora prova a chiudere qualche giorno al 100%.';
+      else if (score > 0) copy = 'Non serve spaccare tutto. Riparti da 3 check oggi.';
+      document.getElementById('bigBossCopy').textContent = copy;
     }
 
     function renderHero() {
@@ -1348,6 +1655,7 @@
 
     function renderAll() {
       renderHeader();
+      renderBigBossScore();
       renderHero();
       renderStats();
       renderHabits();
@@ -1375,6 +1683,51 @@
       calendarAnchor = new Date(calendarAnchor.getFullYear(), calendarAnchor.getMonth() + 1, 1);
       renderCalendar();
     });
+
+    document.getElementById('openWeightSheet').addEventListener('click', openWeightSheet);
+
+
+    function openWeightSheet() {
+      const dayData = getDayData(selectedDay);
+      document.getElementById('sheetWeightInput').value = dayData.weight || '';
+      document.getElementById('bottomOverlay').classList.add('open');
+      document.getElementById('weightSheet').classList.add('open');
+      setTimeout(() => document.getElementById('sheetWeightInput').focus(), 160);
+    }
+
+    function closeWeightSheet() {
+      document.getElementById('bottomOverlay').classList.remove('open');
+      document.getElementById('weightSheet').classList.remove('open');
+    }
+
+    function saveWeightSheet() {
+      const value = document.getElementById('sheetWeightInput').value.trim().replace(',', '.');
+      getDayData(selectedDay).weight = value;
+      save();
+      closeWeightSheet();
+      renderAll();
+    }
+
+    document.addEventListener('click', (event) => {
+      const tappable = event.target.closest('button, .habit, .mood, .day, .weight-card');
+      if (!tappable) return;
+      tappable.classList.remove('tap-pop');
+      void tappable.offsetWidth;
+      tappable.classList.add('tap-pop');
+    });
+
+    document.getElementById('bottomOverlay').addEventListener('click', closeWeightSheet);
+    document.getElementById('closeWeightSheet').addEventListener('click', closeWeightSheet);
+    document.getElementById('saveWeightSheet').addEventListener('click', saveWeightSheet);
+    document.getElementById('sheetWeightInput').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') saveWeightSheet();
+      if (event.key === 'Escape') closeWeightSheet();
+    });
+
+    setTimeout(() => {
+      const splash = document.getElementById('splash');
+      if (splash) splash.classList.add('hidden');
+    }, 700);
 
 
     function launchConfetti() {
