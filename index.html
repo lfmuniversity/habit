@@ -732,6 +732,86 @@
       letter-spacing:-1px;
     }
 
+
+    .weight-card{
+      background:linear-gradient(135deg,#ffffff,#f8f8fa);
+      border-radius:34px;
+      padding:22px;
+      box-shadow:0 10px 28px rgba(0,0,0,.055);
+    }
+
+    .weight-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .weight-value{
+      font-size:52px;
+      line-height:.9;
+      font-weight:950;
+      letter-spacing:-3px;
+    }
+
+    .weight-unit{
+      font-size:18px;
+      color:#8b8b93;
+      font-weight:850;
+      margin-left:4px;
+    }
+
+    .weight-trend{
+      border-radius:999px;
+      background:#E8F8EE;
+      color:#1f8f43;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:950;
+    }
+
+    .weight-input{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:24px;
+      background:#f5f5f7;
+      padding:16px;
+      font-size:18px;
+      font-weight:850;
+      color:#111114;
+      margin-bottom:14px;
+    }
+
+    .weight-chart{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      height:90px;
+      margin-top:10px;
+    }
+
+    .weight-bar{
+      flex:1;
+      background:linear-gradient(180deg,#30D158,#34C759);
+      border-radius:14px 14px 6px 6px;
+      min-height:12px;
+      opacity:.9;
+      position:relative;
+    }
+
+    .weight-bar span{
+      position:absolute;
+      bottom:-22px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:10px;
+      font-weight:850;
+      color:#9a9aa1;
+    }
+
+
     @media (max-width:360px){
       body{padding-left:12px;padding-right:12px}
       h1{font-size:38px}
@@ -803,6 +883,30 @@
     <section class="section">
       <h2 style="margin-bottom:12px">Nota</h2>
       <textarea id="note" placeholder="Cosa salvo di oggi? Cosa posso migliorare domani?"></textarea>
+    </section>
+
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Body Check</h2>
+          <div class="hint">Trend del peso, non perfezione</div>
+        </div>
+      </div>
+
+      <div class="weight-card">
+        <div class="weight-top">
+          <div>
+            <div class="hint" style="margin-bottom:8px">Peso attuale</div>
+            <div class="weight-value"><span id="currentWeight">--</span><span class="weight-unit">kg</span></div>
+          </div>
+          <div class="weight-trend" id="weightTrend">Nessun trend</div>
+        </div>
+
+        <input type="number" step="0.1" id="weightInput" class="weight-input" placeholder="Inserisci peso di oggi" />
+
+        <div class="weight-chart" id="weightChart"></div>
+      </div>
     </section>
 
     <section class="section" id="calendarSection">
@@ -916,7 +1020,7 @@
     }
 
     function getDayData(day) {
-      if (!data[day]) data[day] = { habits: {}, mood: 'ok', note: '' };
+      if (!data[day]) data[day] = { habits: {}, mood: 'ok', note: '', weight: '' };
       if (!data[day].habits) data[day].habits = {};
       if (!data[day].mood) data[day].mood = 'ok';
       if (typeof data[day].note !== 'string') data[day].note = '';
@@ -1080,6 +1184,74 @@
       return days;
     }
 
+
+    function renderWeight() {
+      const dayData = getDayData(selectedDay);
+      const input = document.getElementById('weightInput');
+      const current = document.getElementById('currentWeight');
+      const trend = document.getElementById('weightTrend');
+      const chart = document.getElementById('weightChart');
+
+      input.value = dayData.weight || '';
+      current.textContent = dayData.weight || '--';
+
+      input.oninput = (event) => {
+        dayData.weight = event.target.value;
+        save();
+        renderWeight();
+      };
+
+      const weights = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = toKey(d);
+        const w = parseFloat(getDayData(key).weight);
+        if (!isNaN(w)) {
+          weights.push({
+            day: d.toLocaleDateString('it-IT', { weekday: 'short' }),
+            value: w
+          });
+        }
+      }
+
+      if (weights.length >= 2) {
+        const diff = (weights[weights.length - 1].value - weights[0].value).toFixed(1);
+        if (diff < 0) {
+          trend.textContent = `↓ ${diff} kg settimana`;
+          trend.style.background = '#E8F8EE';
+          trend.style.color = '#1f8f43';
+        } else if (diff > 0) {
+          trend.textContent = `↑ +${diff} kg settimana`;
+          trend.style.background = '#FFF3E0';
+          trend.style.color = '#C26A00';
+        } else {
+          trend.textContent = 'Peso stabile';
+        }
+      } else {
+        trend.textContent = 'Nessun trend';
+      }
+
+      chart.innerHTML = '';
+
+      if (weights.length > 0) {
+        const values = weights.map(w => w.value);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        weights.forEach(item => {
+          const normalized = max === min ? 70 : 20 + ((item.value - min) / (max - min)) * 70;
+
+          const bar = document.createElement('div');
+          bar.className = 'weight-bar';
+          bar.style.height = normalized + '%';
+          bar.innerHTML = `<span>${item.day}</span>`;
+          chart.appendChild(bar);
+        });
+      }
+    }
+
+
     function renderCalendar() {
       document.getElementById('monthLabel').textContent =
         calendarAnchor.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
@@ -1178,6 +1350,7 @@
       renderHabits();
       renderMoods();
       renderNote();
+      renderWeight();
       renderCalendar();
       renderHistory();
       renderWeek();
