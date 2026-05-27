@@ -732,44 +732,6 @@
       letter-spacing:-1px;
     }
 
-    .tabbar{
-      position:fixed;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      width:min(390px, calc(100vw - 34px));
-      height:68px;
-      border-radius:999px;
-      background:rgba(255,255,255,.84);
-      box-shadow:0 18px 50px rgba(0,0,0,.14);
-      backdrop-filter:blur(22px);
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      padding:7px;
-      z-index:20;
-    }
-
-    .tab{
-      border-radius:999px;
-      background:transparent;
-      color:#8b8b93;
-      font-size:12px;
-      font-weight:950;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-    }
-
-    .tab.active{
-      background:#111114;
-      color:white;
-    }
-
-    .app{
-      padding-bottom:88px;
-    }
-
     @media (max-width:360px){
       body{padding-left:12px;padding-right:12px}
       h1{font-size:38px}
@@ -783,7 +745,7 @@
     <header>
       <div>
         <div class="date-label" id="dateLabel">Oggi</div>
-        <h1>Habit Tracker</h1>
+        <h1>Ciao, Big Boss</h1>
       </div>
       <div class="app-icon">✨</div>
     </header>
@@ -807,18 +769,18 @@
     <section class="stats">
       <div class="stat">
         <div class="stat-emoji">🔥</div>
-        <div class="stat-value" id="weekChecks">0</div>
-        <div class="stat-label">Week</div>
+        <div class="stat-value" id="streakDays">0</div>
+        <div class="stat-label">Strike 100%</div>
       </div>
       <div class="stat">
-        <div class="stat-emoji">🎯</div>
+        <div class="stat-emoji">🏆</div>
         <div class="stat-value" id="topHabit">-</div>
-        <div class="stat-label">Top</div>
+        <div class="stat-label">Top Habit</div>
       </div>
       <div class="stat">
         <div class="stat-emoji">🙂</div>
         <div class="stat-value" id="todayMood">🙂</div>
-        <div class="stat-label">Mood</div>
+        <div class="stat-label">Mood oggi</div>
       </div>
     </section>
 
@@ -905,11 +867,6 @@
     <footer>Built with momentum ✨</footer>
   </main>
 
-  <nav class="tabbar" aria-label="Navigazione">
-    <button class="tab active" data-target="todaySection">✅ Oggi</button>
-    <button class="tab" data-target="calendarSection">📅 Calendario</button>
-    <button class="tab" data-target="statsSection">📊 Stats</button>
-  </nav>
   <div class="confetti" id="confetti" aria-hidden="true"></div>
 
   <script>
@@ -1017,10 +974,25 @@
       document.getElementById('selectedMoodPill').textContent = `Mood ${getMood(dayData.mood).emoji}`;
     }
 
+
+    function streak100() {
+      let streak = 0;
+      const d = new Date();
+      while (true) {
+        const key = toKey(d);
+        if (scoreFor(key) >= 100) {
+          streak++;
+          d.setDate(d.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
     function renderStats() {
       const days = last7Days();
-      const total = days.reduce((sum, day) => sum + countCompleted(day), 0);
-      document.getElementById('weekChecks').textContent = total;
+      document.getElementById('streakDays').textContent = streak100();
 
       const best = habits
         .map(h => ({ ...h, count: days.filter(day => getDayData(day).habits[h.id]).length }))
@@ -1244,15 +1216,6 @@
       }
       setTimeout(() => { wrap.innerHTML = ''; }, 1200);
     }
-
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const target = document.getElementById(tab.dataset.target);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
 
     renderAll();
   </script>
